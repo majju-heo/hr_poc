@@ -707,6 +707,329 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('MCP 기반 취업규칙 AI 자동화 플랫폼이 로드되었습니다.');
         });
+
+// 입력 방식 전환
+function switchInputMethod(method) {
+    // 카드 활성화 상태 변경
+    document.querySelectorAll('.method-card').forEach(card => {
+        card.classList.remove('active');
+    });
+    document.querySelector(`[data-method="${method}"]`).classList.add('active');
+    
+    // 섹션 표시/숨김
+    const uploadSection = document.getElementById('uploadSection');
+    const manualSection = document.getElementById('manualSection');
+    
+    if (method === 'upload') {
+        uploadSection.classList.remove('hidden');
+        manualSection.classList.add('hidden');
+    } else {
+        uploadSection.classList.add('hidden');
+        manualSection.classList.remove('hidden');
+    }
+    
+    // 결과 초기화
+    resetReviewResult();
+}
+
+// 파일 업로드 이벤트 설정
+document.addEventListener('DOMContentLoaded', function() {
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    const fileInput = document.getElementById('fileUpload');
+    
+    // 클릭으로 파일 선택
+    fileUploadArea.addEventListener('click', () => {
+        fileInput.click();
+    });
+    
+    // 드래그 앤 드롭
+    fileUploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        fileUploadArea.classList.add('dragover');
+    });
+    
+    fileUploadArea.addEventListener('dragleave', () => {
+        fileUploadArea.classList.remove('dragover');
+    });
+    
+    fileUploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        fileUploadArea.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleFileUpload(files[0]);
+        }
+    });
+    
+    // 파일 선택
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            handleFileUpload(e.target.files[0]);
+        }
+    });
+});
+
+// 파일 업로드 처리
+async function handleFileUpload(file) {
+    // 파일 크기 체크 (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+        alert('파일 크기는 10MB 이하만 업로드 가능합니다.');
+        return;
+    }
+    
+    // 파일 형식 체크
+    const allowedTypes = ['.pdf', '.docx', '.hwp', '.txt'];
+    const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+    if (!allowedTypes.includes(fileExtension)) {
+        alert('지원되는 파일 형식: PDF, DOCX, HWP, TXT');
+        return;
+    }
+    
+    // 로딩 표시
+    document.getElementById('uploadLoading').style.display = 'block';
+    document.getElementById('uploadResult').classList.add('hidden');
+    
+    try {
+        // 파일 읽기 시뮬레이션
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // 파일 내용 읽기 (텍스트 파일의 경우)
+        let fileContent = '';
+        if (file.type === 'text/plain') {
+            fileContent = await readTextFile(file);
+        } else {
+            // PDF, DOCX의 경우 시뮬레이션
+            fileContent = generateMockContent(file.name);
+        }
+        
+        // 회사 정보 자동 추출
+        const extractedInfo = extractCompanyInfo(fileContent, file.name);
+        
+        // 결과 표시
+        showUploadResult(file, extractedInfo, fileContent);
+        
+    } catch (error) {
+        alert('파일 업로드 중 오류가 발생했습니다: ' + error.message);
+    } finally {
+        document.getElementById('uploadLoading').style.display = 'none';
+    }
+}
+
+// 텍스트 파일 읽기
+function readTextFile(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = reject;
+        reader.readAsText(file, 'utf-8');
+    });
+}
+
+// 모의 파일 내용 생성 (PDF, DOCX 시뮬레이션)
+function generateMockContent(fileName) {
+    return `
+        ${fileName.includes('삼성') ? '삼성전자' : 'OO'} 취업규칙
+        
+        제1조 (목적) 이 규칙은 회사의 근로자의 취업에 관한 사항을 정함을 목적으로 한다.
+        제2조 (적용범위) 이 규칙은 회사의 모든 근로자에게 적용한다.
+        제3조 (근로시간) 소정근로시간은 주 40시간, 1일 8시간으로 한다.
+        제4조 (휴게시간) 점심시간은 12:00~13:00 (1시간)으로 한다.
+        제5조 (연차휴가) 1년간 8할 이상 출근한 근로자에게 15일의 유급휴가를 준다.
+        제6조 (임금지급) 임금은 매월 25일에 지급한다.
+        제7조 (징계) 견책, 감봉, 정직, 해고로 구분한다.
+        
+        시행일: 2024.01.01
+        ${fileName.includes('삼성') ? '삼성전자' : 'OO'} 주식회사
+        대표이사 (인)
+    `;
+}
+
+// 회사 정보 자동 추출
+function extractCompanyInfo(content, fileName) {
+    const info = {
+        company: 'OO 주식회사',
+        industry: '정보통신업',
+        employees: '100-300명 (추정)'
+    };
+    
+    // 간단한 패턴 매칭으로 정보 추출
+    const companyMatch = content.match(/(주식회사|회사)\s*([가-힣a-zA-Z0-9\s]+)/);
+    if (companyMatch) {
+        info.company = companyMatch[0].trim();
+    }
+    
+    // 파일명에서 회사명 추출 시도
+    if (fileName.includes('삼성')) {
+        info.company = '삼성전자 주식회사';
+        info.industry = '제조업';
+        info.employees = '1000명 이상';
+    } else if (fileName.includes('네이버')) {
+        info.company = '네이버 주식회사';
+        info.industry = '정보통신업';
+        info.employees = '500-1000명';
+    }
+    
+    // 업종 추정
+    if (content.includes('제조') || content.includes('생산')) {
+        info.industry = '제조업';
+    } else if (content.includes('정보') || content.includes('IT') || content.includes('소프트웨어')) {
+        info.industry = '정보통신업';
+    } else if (content.includes('금융') || content.includes('은행')) {
+        info.industry = '금융업';
+    }
+    
+    return info;
+}
+
+// 업로드 결과 표시
+function showUploadResult(file, extractedInfo, content) {
+    // 파일 정보 표시
+    document.getElementById('fileName').textContent = `${file.name} (${(file.size / 1024).toFixed(1)}KB)`;
+    
+    // 추출된 정보 표시
+    document.getElementById('extractedCompany').textContent = `회사명: ${extractedInfo.company}`;
+    document.getElementById('extractedIndustry').textContent = `업종: ${extractedInfo.industry}`;
+    document.getElementById('extractedEmployees').textContent = `직원 수: ${extractedInfo.employees}`;
+    
+    // 수동 입력 필드에 자동 입력
+    document.getElementById('reviewCompany').value = extractedInfo.company;
+    const industrySelect = document.getElementById('reviewIndustry');
+    if (extractedInfo.industry.includes('제조')) {
+        industrySelect.value = 'manufacturing';
+    } else if (extractedInfo.industry.includes('정보통신')) {
+        industrySelect.value = 'it';
+    } else if (extractedInfo.industry.includes('금융')) {
+        industrySelect.value = 'finance';
+    }
+    document.getElementById('rulesText').value = content;
+    
+    // 결과 영역 표시
+    document.getElementById('uploadResult').classList.remove('hidden');
+    
+    // 자동으로 검토 버튼 활성화 상태 표시
+    const reviewBtn = document.querySelector('.btn-primary');
+    reviewBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+    reviewBtn.innerHTML = '<i class="fas fa-magic"></i> 자동 검토 시작';
+}
+
+// 파일 미리보기
+function previewFile() {
+    const content = document.getElementById('rulesText').value;
+    if (!content) {
+        alert('파일 내용이 없습니다.');
+        return;
+    }
+    
+    const newWindow = window.open('', '_blank');
+    newWindow.document.write(`
+        <html>
+        <head><title>취업규칙 미리보기</title>
+        <style>
+            body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; }
+            h1 { color: #333; border-bottom: 2px solid #4169e1; padding-bottom: 10px; }
+            pre { white-space: pre-wrap; background: #f8f9fa; padding: 20px; border-radius: 8px; }
+        </style>
+        </head>
+        <body>
+            <h1>📋 취업규칙 미리보기</h1>
+            <pre>${content}</pre>
+        </body>
+        </html>
+    `);
+}
+
+// 파일 제거
+function removeFile() {
+    document.getElementById('uploadResult').classList.add('hidden');
+    document.getElementById('fileUpload').value = '';
+    document.getElementById('reviewCompany').value = '';
+    document.getElementById('reviewIndustry').value = '';
+    document.getElementById('rulesText').value = '';
+    
+    // 버튼 원상복구
+    const reviewBtn = document.querySelector('.btn-primary');
+    reviewBtn.style.background = '';
+    reviewBtn.innerHTML = '<i class="fas fa-search"></i> 검토 시작';
+    
+    resetReviewResult();
+}
+
+// 검토 결과 초기화
+function resetReviewResult() {
+    document.getElementById('reviewResult').style.display = 'none';
+    document.getElementById('noReviewYet').style.display = 'block';
+}
+
+// 기존 reviewRules 함수 개선
+async function reviewRules() {
+    let rulesText = '';
+    let company = '';
+    let industry = '';
+    
+    // 업로드 방식인지 수동 입력 방식인지 확인
+    const activeMethod = document.querySelector('.method-card.active').dataset.method;
+    
+    if (activeMethod === 'upload') {
+        // 업로드된 파일이 있는지 확인
+        if (document.getElementById('uploadResult').classList.contains('hidden')) {
+            alert('먼저 파일을 업로드해주세요.');
+            return;
+        }
+        rulesText = document.getElementById('rulesText').value;
+        company = document.getElementById('reviewCompany').value;
+        industry = document.getElementById('reviewIndustry').value;
+    } else {
+        // 수동 입력 확인
+        rulesText = document.getElementById('rulesText').value;
+        company = document.getElementById('reviewCompany').value;
+        industry = document.getElementById('reviewIndustry').value;
+        
+        if (!rulesText.trim()) {
+            alert('검토할 취업규칙을 입력해주세요.');
+            return;
+        }
+    }
+
+    document.getElementById('reviewLoading').style.display = 'block';
+    document.getElementById('reviewResult').style.display = 'none';
+    document.getElementById('noReviewYet').style.display = 'none';
+
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // 기존 검토 로직은 그대로 유지
+    const issues = [];
+    let riskLevel = 'low';
+
+    if (!/주.*40시간/i.test(rulesText)) {
+        issues.push({
+            title: '근로시간 규정 누락',
+            description: '근로기준법 제50조에 따른 주 40시간 규정이 없습니다.',
+            solution: '주 40시간 근로시간 규정을 추가해야 합니다.'
+        });
+        riskLevel = 'critical';
+    }
+
+    if (!/연차.*휴가/i.test(rulesText)) {
+        issues.push({
+            title: '연차휴가 규정 불명확',
+            description: '근로기준법 제60조에 따른 연차휴가 규정이 부족합니다.',
+            solution: '15일 연차휴가 규정을 명시해야 합니다.'
+        });
+        if (riskLevel === 'low') riskLevel = 'medium';
+    }
+
+    const riskBadge = {
+        'low': { text: '낮음', class: 'risk-low', icon: 'fas fa-check-circle' },
+        'medium': { text: '보통', class: 'risk-medium', icon: 'fas fa-exclamation-triangle' },
+        'critical': { text: '매우 높음', class: 'risk-critical', icon: 'fas fa-times-circle' }
+    }[riskLevel];
+
+    let issuesHTML = '<h4><i class="fas fa-exclamation-triangle"></i> 발견된 문제점</h4>';
+    if (issues.length === 0) {
+        issuesHTML += '<div class="info-card success"><p><i class="fas fa-check"></i> 발견된 문제점이 없습니다.</p></div>';
+    } else {
+        issues.forEach
+        
     </script>
 </body>
 </html>
