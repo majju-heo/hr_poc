@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>취업규칙 AI 자동화 플랫폼</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="header glass-card">
+            <h1><i class="fas fa-robot"></i> 취업규칙 AI 자동화 플랫폼</h1>
+            <p>AI 기반 취업규칙 자동 생성 및 법령 준수 검토 시스템</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('generate')">
+                <span><i class="fas fa-magic"></i> 규칙 생성</span>
+            </button>
+            <button class="tab" onclick="switchTab('review')">
+                <span><i class="fas fa-search"></i> 규칙 검토</span>
+            </button>
+            <button class="tab" onclick="switchTab('compare')">
+                <span><i class="fas fa-chart-bar"></i> 비교 분석</span>
+            </button>
+        </div>
+        
+        <!-- 규칙 생성 탭 -->
+        <div id="generate" class="tab-content active">
+            <div class="section-header">
+                <i class="fas fa-magic icon"></i>
+                <h2>취업규칙 자동 생성</h2>
+            </div>
+            
+            <div class="form-section">
+                <div class="form-panel">
+                    <div class="form-group">
+                        <label for="companyName">
+                            <i class="fas fa-building"></i>
+                            회사명
+                        </label>
+                        <input type="text" id="companyName" placeholder="주식회사 샘플" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="industry">
+                            <i class="fas fa-industry"></i>
+                            업종
+                        </label>
+                        <select id="industry" required>
+                            <option value="">업종 선택</option>
+                            <option value="manufacturing">🏭 제조업</option>
+                            <option value="it">💻 정보통신업</option>
+                            <option value="retail">🛍️ 도소매업</option>
+                            <option value="finance">🏦 금융업</option>
+                            <option value="construction">🏗️ 건설업</option>
+                            <option value="service">🔧 서비스업</option>
+                            <option value="food">🍽️ 음식점업</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="employeeCount">
+                            <i class="fas fa-users"></i>
+                            직원 수
+                        </label>
+                        <input type="number" id="employeeCount" placeholder="50" min="1" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="workingHours">
+                            <i class="fas fa-clock"></i>
+                            근무시간
+                        </label>
+                        <select id="workingHours">
+                            <option value="9to6">09:00 - 18:00</option>
+                            <option value="8to5">08:00 - 17:00</option>
+                            <option value="10to7">10:00 - 19:00</option>
+                            <option value="flexible">유연근무제</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="specialProvisions">
+                            <i class="fas fa-edit"></i>
+                            특별 조항
+                        </label>
+                        <textarea id="specialProvisions" placeholder="회사별 특별한 규정이나 조항을 입력하세요..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-panel preview-section">
+                    <h3><i class="fas fa-file-alt"></i> 생성된 취업규칙 미리보기</h3>
+                    <div id="generatedRules">
+                        <div style="color: #94a3b8; text-align: center; padding: 60px 20px;">
+                            <i class="fas fa-arrow-left" style="font-size: 2rem; margin-bottom: 16px; opacity: 0.5;"></i>
+                            <p style="font-size: 18px; font-weight: 500;">좌측 정보를 입력하고 "규칙 생성" 버튼을 클릭하세요.</p>
+                            <p style="font-size: 14px; margin-top: 8px; opacity: 0.7;">AI가 자동으로 법령에 맞는 취업규칙을 생성합니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="generateRules()">
+                    <i class="fas fa-magic"></i> 규칙 생성
+                </button>
+                <button class="btn btn-secondary" onclick="downloadRules()">
+                    <i class="fas fa-download"></i> 다운로드
+                </button>
+                <button class="btn btn-success" onclick="autoReview()">
+                    <i class="fas fa-search"></i> 자동 검토
+                </button>
+            </div>
+            
+            <div class="loading" id="generateLoading">
+                <div class="spinner"></div>
+                <p><i class="fas fa-cog fa-spin"></i> AI가 취업규칙을 생성하고 있습니다...</p>
+            </div>
+        </div>
+        
+        <!-- 규칙 검토 탭 -->
+        <div id="review" class="tab-content">
+            <div class="section-header">
+                <i class="fas fa-search icon"></i>
+                <h2>취업규칙 자동 검토</h2>
+            </div>
+            
+            <div class="form-section">
+                <div class="form-panel">
+                    <div class="form-group">
+                        <label for="reviewCompany">
+                            <i class="fas fa-building"></i>
+                            회사명
+                        </label>
+                        <input type="text" id="reviewCompany" placeholder="검토할 회사명">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reviewIndustry">
+                            <i class="fas fa-industry"></i>
+                            업종
+                        </label>
+                        <select id="reviewIndustry">
+                            <option value="">업종 선택</option>
+                            <option value="manufacturing">🏭 제조업</option>
+                            <option value="it">💻 정보통신업</option>
+                            <option value="retail">🛍️ 도소매업</option>
+                            <option value="finance">🏦 금융업</option>
+                            <option value="construction">🏗️ 건설업</option>
+                            <option value="service">🔧 서비스업</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="rulesText">
+                            <i class="fas fa-file-text"></i>
+                            취업규칙 원문
+                        </label>
+                        <textarea id="rulesText" placeholder="검토할 취업규칙 전문을 입력하세요...
+
+예시:
+제1조 (목적) 이 규칙은 회사의 근로자의 취업에 관한 사항을 정함을 목적으로 한다.
+제2조 (적용범위) 이 규칙은 회사의 모든 근로자에게 적용한다.
+..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-panel">
+                    <div id="reviewResult" class="analysis-result" style="display: none;">
+                        <h3><i class="fas fa-clipboard-check"></i> 검토 결과</h3>
+                        <div id="riskLevel"></div>
+                        <div id="issues"></div>
+                        <div id="suggestions"></div>
+                    </div>
+                    
+                    <div id="noReviewYet" style="color: #94a3b8; text-align: center; padding: 60px 20px;">
+                        <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 16px; opacity: 0.5;"></i>
+                        <p style="font-size: 18px; font-weight: 500;">취업규칙을 입력하고 검토를 시작하세요.</p>
+                        <p style="font-size: 14px; margin-top: 8px; opacity: 0.7;">AI가 법령 준수 여부를 자동으로 분석합니다.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="reviewRules()">
+                    <i class="fas fa-search"></i> 검토 시작
+                </button>
+                <button class="btn btn-secondary" onclick="generateReport()">
+                    <i class="fas fa-file-alt"></i> 보고서 생성
+                </button>
+            </div>
+            
+            <div class="loading" id="reviewLoading">
+                <div class="spinner"></div>
+                <p><i class="fas fa-cog fa-spin"></i> AI가 취업규칙을 검토하고 있습니다...</p>
+            </div>
+        </div>
+        
+        <!-- 비교 분석 탭 -->
+        <div id="compare" class="tab-content">
+            <div class="section-header">
+                <i class="fas fa-chart-bar icon"></i>
+                <h2>업종별 비교 분석</h2>
+            </div>
+            
+            <div class="form-section">
+                <div class="form-panel">
+                    <div class="form-group">
+                        <label for="compareIndustry">
+                            <i class="fas fa-industry"></i>
+                            비교 업종
+                        </label>
+                        <select id="compareIndustry">
+                            <option value="it">💻 정보통신업</option>
+                            <option value="manufacturing">🏭 제조업</option>
+                            <option value="finance">🏦 금융업</option>
+                            <option value="retail">🛍️ 도소매업</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="compareSize">
+                            <i class="fas fa-users"></i>
+                            회사 규모
+                        </label>
+                        <select id="compareSize">
+                            <option value="small">🏢 소기업 (10-49명)</option>
+                            <option value="medium">🏬 중기업 (50-299명)</option>
+                            <option value="large">🏭 대기업 (300명 이상)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="info-card highlight">
+                        <h4><i class="fas fa-info-circle"></i> 분석 범위</h4>
+                        <p>• 업종별 표준 근로조건 비교</p>
+                        <p>• 규모별 복리후생 수준 분석</p>
+                        <p>• 법적 리스크 요소 검토</p>
+                        <p>• 개선 권장사항 제시</p>
+                    </div>
+                </div>
+                
+                <div class="form-panel preview-section">
+                    <h3><i class="fas fa-chart-line"></i> 업종별 표준 기준</h3>
+                    <div id="comparisonResult">
+                        <div style="color: #94a3b8; text-align: center; padding: 60px 20px;">
+                            <i class="fas fa-chart-bar" style="font-size: 2rem; margin-bottom: 16px; opacity: 0.5;"></i>
+                            <p style="font-size: 18px; font-weight: 500;">분석을 시작하려면 "분석 시작" 버튼을 클릭하세요.</p>
+                            <p style="font-size: 14px; margin-top: 8px; opacity: 0.7;">업종별 표준 기준과 비교 분석 결과를 제공합니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="compareRules()">
+                    <i class="fas fa-chart-bar"></i> 분석 시작
+                </button>
+                <button class="btn btn-secondary" onclick="exportComparison()">
+                    <i class="fas fa-file-export"></i> 비교표 내보내기
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 탭 전환 함수
+        function switchTab(tabName) {
+            // 모든 탭 비활성화
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // 선택된 탭 활성화
+            event.target.closest('.tab').classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // 취업규칙 생성 함수
+        function generateRules() {
+            const companyName = document.getElementById('companyName').value;
+            const industry = document.getElementById('industry').value;
+            const employeeCount = document.getElementById('employeeCount').value;
+            const workingHours = document.getElementById('workingHours').value;
+            const specialProvisions = document.getElementById('specialProvisions').value;
+
+            if (!companyName || !industry || !employeeCount) {
+                alert('필수 정보를 모두 입력해주세요.');
+                return;
+            }
+
+            // 로딩 표시
+            document.getElementById('generateLoading').style.display = 'block';
+
+            // 2초 후 결과 생성 (실제로는 API 호출)
+            setTimeout(() => {
+                const generatedRules = generateEmploymentRules(companyName, industry, employeeCount, workingHours, specialProvisions);
+                document.getElementById('generatedRules').innerHTML = generatedRules;
+                document.getElementById('generateLoading').style.display = 'none';
+            }, 2000);
+        }
+
+        // 취업규칙 템플릿 생성
+        function generateEmploymentRules(companyName, industry, employeeCount, workingHours, specialProvisions) {
+            const workingHoursText = {
+                '9to6': '오전 9시부터 오후 6시까지',
+                '8to5': '오전 8시부터 오후 5시까지',
+                '10to7': '오전 10시부터 오후 7시까지',
+                'flexible': '유연근무제 적용'
+            };
+
+            const industrySpecific = {
+                'manufacturing': '제조업 특성상 안전 규정을 엄격히 준수해야 함',
+                'it': 'IT업계 특성상 재택근무 및 유연근무 허용',
+                'retail': '고객 서비스 우선 원칙 적용',
+                'finance': '금융업 관련 법령 준수 및 보안 규정 엄격 적용',
+                'construction': '건설업 안전 규정 및 현장 근무 규칙 적용',
+                'service': '서비스업 특성에 맞는 고객 응대 규정 적용'
+            };
+
+            return `
+                <div class="generated-rules">
+                    <h2>${companyName} 취업규칙</h2>
+                    
+                    <h3>제1장 총칙</h3>
+                    <p><strong>제1조 (목적)</strong><br>
+                    이 규칙은 ${companyName}(이하 "회사"라 한다)의 근로자의 취업에 관한 사항을 정함을 목적으로 한다.</p>
+                    
+                    <p><strong>제2조 (적용범위)</strong><br>
+                    이 규칙은 회사의 모든 근로자에게 적용한다. 단, 별도의 근로계약이나 단체협약이 있는 경우에는 그에 따른다.</p>
+                    
+                    <h3>제2장 근로시간 및 휴게</h3>
+                    <p><strong>제3조 (근로시간)</strong><br>
+                    1. 소정근로시간은 주 40시간으로 하고, 1일 8시간으로 한다.<br>
+                    2. 근무시간은 ${workingHoursText[workingHours]}로 한다.<br>
+                    3. 점심시간은 12:00~13:00 (1시간)으로 한다.</p>
+                    
+                    <p><strong>제4조 (휴일)</strong><br>
+                    1. 주휴일: 토요일, 일요일<br>
+                    2. 국경일 및 관공서의 공휴일<br>
+                    3. 기타 회사가 지정하는 날</p>
+                    
+                    <h3>제3장 임금</h3>
+                    <p><strong>제5조 (임금의 구성)</strong><br>
+                    임금은 기본급, 제수당, 상여금으로 구성한다.</p>
+                    
+                    <p><strong>제6조 (임금의 지급)</strong><br>
+                    임금은 매월 25일에 지급한다. 단, 지급일이 휴일인 경우에는 그 전일에 지급한다.</p>
+                    
+                    <h3>제4장 복리후생</h3>
+                    <p><strong>제7조 (연차유급휴가)</strong><br>
+                    근로기준법에 따라 연차유급휴가를 부여한다.</p>
+                    
+                    <h3>제5장 징계</h3>
+                    <p><strong>제8조 (징계의 종류)</strong><br>
+                    징계의 종류는 다음과 같다.<br>
+                    1. 견책<br>
+                    2. 감봉<br>
+                    3. 정직<br>
+                    4. 해고</p>
+                    
+                    ${specialProvisions ? `<h3>제6장 특별 조항</h3><p><strong>제9조 (특별 규정)</strong><br>${specialProvisions}</p>` : ''}
+                    
+                    <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                        <p style="color: #6366f1;"><strong>🏢 업종별 특성:</strong><br>${industrySpecific[industry] || ''}</p>
+                    </div>
+                    
+                    <div style="margin-top: 40px; text-align: center; color: #6c757d; border-top: 2px solid #e2e8f0; padding-top: 20px;">
+                        <p><strong>시행일:</strong> ${new Date().toLocaleDateString('ko-KR')}</p>
+                        <p style="margin-top: 8px;"><strong>${companyName} 대표이사</strong></p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 자동 검토 함수
+        function autoReview() {
+            const generatedContent = document.getElementById('generatedRules').innerHTML;
+            if (!generatedContent || generatedContent.includes('좌측 정보를 입력하고')) {
+                alert('먼저 취업규칙을 생성해주세요.');
+                return;
+            }
+            
+            // 검토 탭으로 이동하고 내용 자동 입력
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.querySelector('[onclick="switchTab(\'review\')"]').classList.add('active');
+            document.getElementById('review').classList.add('active');
+            
+            const companyName = document.getElementById('companyName').value;
+            const industry = document.getElementById('industry').value;
+            
+            document.getElementById('reviewCompany').value = companyName;
+            document.getElementById('reviewIndustry').value = industry;
+            document.getElementById('rulesText').value = generatedContent.replace(/<[^>]*>/g, '').trim();
+            
+            // 자동으로 검토 시작
+            setTimeout(() => {
+                reviewRules();
+            }, 500);
+        }
+
+        // 취업규칙 검토 함수
+        function reviewRules() {
+            const rulesText = document.getElementById('rulesText').value;
+            const industry = document.getElementById('reviewIndustry').value;
+            
+            if (!rulesText.trim()) {
+                alert('검토할 취업규칙을 입력해주세요.');
+                return;
+            }
+
+            document.getElementById('reviewLoading').style.display = 'block';
+            document.getElementById('reviewResult').style.display = 'none';
+            document.getElementById('noReviewYet').style.display = 'none';
+
+            // 2초 후 검토 결과 표시
+            setTimeout(() => {
+                const reviewResult = analyzeEmploymentRules(rulesText, industry);
+                displayReviewResult(reviewResult);
+                document.getElementById('reviewLoading').style.display = 'none';
+                document.getElementById('reviewResult').style.display = 'block';
+            }, 2000);
+        }
+
+        // 취업규칙 분석 함수
+        function analyzeEmploymentRules(rulesText, industry) {
+            const issues = [];
+            const suggestions = [];
+            let riskLevel = 'low';
+
+            // 필수 조항 검사
+            const requiredClauses = [
+                { clause: '근로시간', regex: /근로시간|근무시간/i },
+                { clause: '임금', regex: /임금|급여/i },
+                { clause: '휴일', regex: /휴일|휴가/i },
+                { clause: '징계', regex: /징계/i }
+            ];
+
+            requiredClauses.forEach(item => {
+                if (!item.regex.test(rulesText)) {
+                    issues.push({
+                        type: 'critical',
+                        title: `필수 조항 누락: ${item.clause}`,
+                        description: `근로기준법상 필수 조항인 ${item.clause}에 대한 규정이 없습니다.`,
+                        solution: `${item.clause}에 대한 구체적인 규정을 추가해야 합니다.`
+                    });
+                    riskLevel = 'critical';
+                }
+            });
+
+            // 근로시간 관련 검사
+            if (/주.*48시간|일.*10시간/i.test(rulesText)) {
+                issues.push({
+                    type: 'high',
+                    title: '근로시간 위반',
+                    description: '법정 근로시간(주 40시간, 일 8시간)을 초과하는 규정이 있습니다.',
+                    solution: '근로기준법에 맞게 주 40시간, 일 8시간으로 수정해야 합니다.'
+                });
+                if (riskLevel === 'low') riskLevel = 'high';
+            }
+
+            // 연차휴가 관련 검사
+            if (!/연차.*휴가/i.test(rulesText)) {
+                issues.push({
+                    type: 'medium',
+                    title: '연차휴가 규정 불명확',
+                    description: '연차휴가에 대한 구체적인 규정이 부족합니다.',
+                    solution: '근로기준법에 따른 연차휴가 일수와 사용 절차를 명시해야 합니다.'
+                });
+                if (riskLevel === 'low') riskLevel = 'medium';
+            }
+
+            // 업종별 특별 검사
+            if (industry === 'it' && !/재택근무|유연근무/i.test(rulesText)) {
+                suggestions.push({
+                    title: 'IT업종 특성 반영 제안',
+                    description: 'IT업계 특성상 재택근무나 유연근무제 도입을 고려해보세요.',
+                    benefit: '직원 만족도 향상 및 우수 인재 확보에 도움됩니다.'
+                });
+            }
+
+            if (industry === 'manufacturing' && !/안전|보호구/i.test(rulesText)) {
+                issues.push({
+                    type: 'high',
+                    title: '안전 규정 부족',
+                    description: '제조업 특성상 안전 관련 규정이 필수입니다.',
+                    solution: '산업안전보건법에 따른 안전 규정을 추가해야 합니다.'
+                });
+                if (riskLevel === 'low' || riskLevel === 'medium') riskLevel = 'high';
+            }
+
+            // 긍정적인 요소 체크
+            if (/복리후생|교육지원|자기계발/i.test(rulesText)) {
+                suggestions.push({
+                    title: '복리후생 규정 우수',
+                    description: '직원 복리후생에 대한 규정이 잘 마련되어 있습니다.',
+                    benefit: '직원 만족도와 회사 이미지 향상에 도움됩니다.'
+                });
+            }
+
+            return { issues, suggestions, riskLevel };
+        }
+
+        // 검토 결과 표시 함수
+        function displayReviewResult(result) {
+            const riskLevelDiv = document.getElementById('riskLevel');
+            const issuesDiv = document.getElementById('issues');
+            const suggestionsDiv = document.getElementById('suggestions');
+
+            // 위험도 표시
+            const riskLabels = {
+                'low': { text: '낮음', class: 'risk-low', icon: 'fas fa-check-circle' },
+                'medium': { text: '보통', class: 'risk-medium', icon: 'fas fa-exclamation-triangle' },
+                'high': { text: '높음', class: 'risk-high', icon: 'fas fa-exclamation-circle' },
+                'critical': { text: '매우 높음', class: 'risk-critical', icon: 'fas fa-times-circle' }
+            };
+
+            const risk = riskLabels[result.riskLevel];
+            riskLevelDiv.innerHTML = `<div class="risk-badge ${risk.class}"><i class="${risk.icon}"></i> 위험도: ${risk.text}</div>`;
+
+            // 이슈 표시
+            let issuesHTML = '<h4><i class="fas fa-exclamation-triangle"></i> 발견된 문제점</h4>';
+            if (result.issues.length === 0) {
+                issuesHTML += '<div class="info-card success"><p><i class="fas fa-check"></i> 발견된 문제점이 없습니다.</p></div>';
+            } else {
+                result.issues.forEach(issue => {
+                    const issueClass = issue.type === 'critical' ? '' : issue.type === 'high' ? '' : 'warning';
+                    issuesHTML += `
+                        <div class="issue-item ${issueClass}">
+                            <h4><i class="fas fa-bug"></i> ${issue.title}</h4>
+                            <p><strong>문제:</strong> ${issue.description}</p>
+                            <p><strong>해결방안:</strong> ${issue.solution}</p>
+                        </div>
+                    `;
+                });
+            }
+            issuesDiv.innerHTML = issuesHTML;
+
+            // 제안사항 표시
+            let suggestionsHTML = '<h4><i class="fas fa-lightbulb"></i> 개선 제안사항</h4>';
+            if (result.suggestions.length === 0) {
+                suggestionsHTML += '<div class="info-card"><p>추가 제안사항이 없습니다.</p></div>';
+            } else {
+                result.suggestions.forEach(suggestion => {
+                    suggestionsHTML += `
+                        <div class="issue-item info">
+                            <h4><i class="fas fa-star"></i> ${suggestion.title}</h4>
+                            <p><strong>제안:</strong> ${suggestion.description}</p>
+                            <p><strong>효과:</strong> ${suggestion.benefit}</p>
+                        </div>
+                    `;
+                });
+            }
+            suggestionsDiv.innerHTML = suggestionsHTML;
+        }
+
+        // 비교 분석 함수
+        function compareRules() {
+            const industry = document.getElementById('compareIndustry').value;
+            const size = document.getElementById('compareSize').value;
+            
+            const comparisonData = getIndustryStandards(industry, size);
+            displayComparison(comparisonData);
+        }
+
+        // 업종별 표준 데이터 생성
+        function getIndustryStandards(industry, size) {
+            const standards = {
+                'it': {
+                    workingHours: '주 40시간 (유연근무 70% 적용)',
+                    vacation: '법정 연차 + 리프레시 휴가 5일',
+                    benefits: '재택근무, 교육비 지원, 건강검진',
+                    salary: '연봉제 95%, 성과급 연동',
+                    special: '개발자 특별 수당, 도서구입비 지원'
+                },
+                'manufacturing': {
+                    workingHours: '주 40시간 (교대근무 50% 적용)',
+                    vacation: '법정 연차 + 하계휴가 3일',
+                    benefits: '안전보험, 작업복 지급, 안전교육',
+                    salary: '월급제 80%, 생산성 보너스',
+                    special: '안전 규정 준수, 위험수당 지급'
+                },
+                'finance': {
+                    workingHours: '주 40시간 (연장근무 제한적)',
+                    vacation: '법정 연차 + 개인휴가 7일',
+                    benefits: '금융상품 우대, 자격증 취득 지원',
+                    salary: '연봉제 90%, 성과 인센티브',
+                    special: '보안 규정 엄격, 이해충돌 방지'
+                },
+                'retail': {
+                    workingHours: '주 40시간 (순환근무 적용)',
+                    vacation: '법정 연차 + 매장휴무일 연계',
+                    benefits: '직원할인, 판매 인센티브',
+                    salary: '시급제 60%, 월급제 40%',
+                    special: '고객서비스 교육, 매출 연동 보상'
+                }
+            };
+
+            const sizeMultipliers = {
+                'small': { vacation: 0.8, benefits: 0.7, salary: 0.9 },
+                'medium': { vacation: 1.0, benefits: 1.0, salary: 1.0 },
+                'large': { vacation: 1.2, benefits: 1.3, salary: 1.1 }
+            };
+
+            return {
+                standard: standards[industry],
+                sizeAdjustment: sizeMultipliers[size],
+                industryName: {
+                    'it': '정보통신업',
+                    'manufacturing': '제조업',
+                    'finance': '금융업',
+                    'retail': '도소매업'
+                }[industry],
+                sizeName: {
+                    'small': '소기업',
+                    'medium': '중기업',
+                    'large': '대기업'
+                }[size]
+            };
+        }
+
+        // 비교 결과 표시
+        function displayComparison(data) {
+            const resultDiv = document.getElementById('comparisonResult');
+            
+            resultDiv.innerHTML = `
+                <div style="background: white; color: #2d3748; border-radius: 16px; padding: 32px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                    <h3 style="color: #6366f1; margin-bottom: 24px;">
+                        <i class="fas fa-chart-line"></i> ${data.industryName} ${data.sizeName} 표준 기준
+                    </h3>
+                    
+                    <div class="comparison-grid">
+                        <div class="comparison-item">
+                            <h4><i class="fas fa-clock"></i> 근로시간</h4>
+                            <p>${data.standard.workingHours}</p>
+                        </div>
+                        
+                        <div class="comparison-item">
+                            <h4><i class="fas fa-umbrella-beach"></i> 휴가제도</h4>
+                            <p>${data.standard.vacation}</p>
+                        </div>
+                        
+                        <div class="comparison-item">
+                            <h4><i class="fas fa-gift"></i> 복리후생</h4>
+                            <p>${data.standard.benefits}</p>
+                        </div>
+                        
+                        <div class="comparison-item">
+                            <h4><i class="fas fa-money-bill-wave"></i> 급여체계</h4>
+                            <p>${data.standard.salary}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card highlight" style="margin-top: 24px;">
+                        <h4><i class="fas fa-star"></i> 특별사항</h4>
+                        <p>${data.standard.special}</p>
+                    </div>
+                    
+                    <div class="info-card" style="margin-top: 20px;">
+                        <h4><i class="fas fa-chart-bar"></i> 규모별 조정 사항</h4>
+                        <p>• 휴가: 표준 대비 ${Math.round(data.sizeAdjustment.vacation * 100)}%</p>
+                        <p>• 복리후생: 표준 대비 ${Math.round(data.sizeAdjustment.benefits * 100)}%</p>
+                        <p>• 급여수준: 표준 대비 ${Math.round(data.sizeAdjustment.salary * 100)}%</p>
+                    </div>
+                    
+                    <div class="info-card success" style="margin-top: 20px;">
+                        <h4><i class="fas fa-lightbulb"></i> 권장사항</h4>
+                        <p>• 업종 특성에 맞는 유연한 근무제도 도입</p>
+                        <p>• 직원 만족도 향상을 위한 복리후생 확대</p>
+                        <p>• 법령 준수를 위한 정기적인 규정 검토</p>
+                        <p>• 동종업계 대비 경쟁력 있는 처우 수준 유지</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 다운로드 함수
+        function downloadRules() {
+            const content = document.getElementById('generatedRules').innerText;
+            if (!content || content.includes('좌측 정보를 입력하고')) {
+                alert('먼저 취업규칙을 생성해주세요.');
+                return;
+            }
+            
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '취업규칙.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // 보고서 생성 함수
+        function generateReport() {
+            const reviewResult = document.getElementById('reviewResult');
+            if (reviewResult.style.display === 'none') {
+                alert('먼저 검토를 완료해주세요.');
+                return;
+            }
+            
+            const companyName = document.getElementById('reviewCompany').value || '회사명';
+            const today = new Date().toLocaleDateString('ko-KR');
+            
+            const reportContent = `
+==========================================
+취업규칙 검토 보고서
+==========================================
+
+회사명: ${companyName}
+검토일: ${today}
+검토자: AI 자동 검토 시스템
+
+${reviewResult.innerText}
+
+==========================================
+※ 본 보고서는 AI 시스템에 의한 자동 분석 결과이며, 
+   최종 검토는 노무 전문가의 확인이 필요합니다.
+==========================================
+            `.trim();
+            
+            const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `취업규칙_검토보고서_${companyName}_${today.replace(/\./g, '')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // 비교표 내보내기 함수
+        function exportComparison() {
+            const comparisonContent = document.getElementById('comparisonResult').innerText;
+            if (!comparisonContent || comparisonContent.includes('분석을 시작하려면')) {
+                alert('먼저 비교 분석을 완료해주세요.');
+                return;
+            }
+            
+            const today = new Date().toLocaleDateString('ko-KR');
+            const exportContent = `
+==========================================
+업종별 취업규칙 비교 분석표
+==========================================
+
+생성일: ${today}
+
+${comparisonContent}
+
+==========================================
+※ 본 분석표는 AI 시스템에 의한 자동 분석 결과입니다.
+==========================================
+            `.trim();
+            
+            const blob = new Blob([exportContent], { type: 'text/plain;charset=utf-8' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `업종별_비교분석표_${today.replace(/\./g, '')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            // 현재 날짜로 일부 필드 초기화
+            const today = new Date();
+            console.log('🚀 취업규칙 AI 시스템 초기화 완료:', today.toLocaleDateString('ko-KR'));
+            
+            // 인터랙티브 요소들 초기화
+            const inputs = document.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'translateY(-2px)';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'translateY(0)';
+                });
+            });
+
+            // 버튼 호버 효과
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px) scale(1.02)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    if (!this.disabled) {
+                        this.style.transform = 'translateY(0) scale(1)';
+                    }
+                });
+            });
+        });
+
+        // 키보드 단축키
+        document.addEventListener('keydown', function(e) {
+            // Ctrl + Enter로 빠른 생성/검토
+            if (e.ctrlKey && e.key === 'Enter') {
+                const activeTab = document.querySelector('.tab-content.active');
+                if (activeTab.id === 'generate') {
+                    generateRules();
+                } else if (activeTab.id === 'review') {
+                    reviewRules();
+                } else if (activeTab.id === 'compare') {
+                    compareRules();
+                }
+            }
+            
+            // 탭 네비게이션 (Ctrl + 1,2,3)
+            if (e.ctrlKey) {
+                switch(e.key) {
+                    case '1':
+                        e.preventDefault();
+                        switchTab('generate');
+                        document.querySelector('[onclick="switchTab(\'generate\')"]').click();
+                        break;
+                    case '2':
+                        e.preventDefault();
+                        switchTab('review');
+                        document.querySelector('[onclick="switchTab(\'review\')"]').click();
+                        break;
+                    case '3':
+                        e.preventDefault();
+                        switchTab('compare');
+                        document.querySelector('[onclick="switchTab(\'compare\')"]').click();
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
