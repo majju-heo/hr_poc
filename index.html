@@ -322,12 +322,23 @@
 
     <script>
         
-       // 탭 전환
+// 탭 전환 (수정된 버전)
 function switchTab(tabName) {
+    // 모든 탭 비활성화
     document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-    event.target.closest('.tab').classList.add('active');
-    document.getElementById(tabName).classList.add('active');
+    
+    // 클릭된 탭 찾아서 활성화 (안전한 방법)
+    const clickedTab = document.querySelector(`[onclick="switchTab('${tabName}')"]`);
+    if (clickedTab) {
+        clickedTab.classList.add('active');
+    }
+    
+    // 해당 탭 콘텐츠 활성화
+    const targetContent = document.getElementById(tabName);
+    if (targetContent) {
+        targetContent.classList.add('active');
+    }
 }
 
 // 입력 방식 전환
@@ -749,33 +760,49 @@ async function generateRules() {
     document.getElementById('generateLoading').style.display = 'none';
 }
 
-// 자동 검토
+// 자동 검토 (수정된 버전)
 function autoReview() {
-    const content = document.getElementById('generatedRules').innerHTML;
+    const generatedRules = document.getElementById('generatedRules');
+    if (!generatedRules) {
+        alert('생성된 규칙이 없습니다.');
+        return;
+    }
+    
+    const content = generatedRules.innerHTML;
     if (!content || content.includes('좌측 정보를 입력하고')) {
         alert('먼저 취업규칙을 생성해주세요.');
         return;
     }
     
-    // 검토 탭으로 이동
+    // 검토 탭으로 이동 (안전한 방법)
     switchTab('review');
-    document.querySelector('[onclick="switchTab(\'review\')"]').click();
     
-    // 수동 입력 방식으로 전환 (안전하게 체크)
-    if (typeof switchInputMethod === 'function') {
-        switchInputMethod('manual');
-    }
-    
-    // 생성된 내용을 검토 탭에 자동 입력
-    const reviewCompany = document.getElementById('reviewCompany');
-    const reviewIndustry = document.getElementById('reviewIndustry');
-    const rulesText = document.getElementById('rulesText');
-    
-    if (reviewCompany) reviewCompany.value = document.getElementById('companyName').value;
-    if (reviewIndustry) reviewIndustry.value = document.getElementById('industry').value;
-    if (rulesText) rulesText.value = content.replace(/<[^>]*>/g, '').trim();
-    
-    setTimeout(() => reviewRules(), 500);
+    // 잠시 대기 후 수동 입력 방식으로 전환
+    setTimeout(() => {
+        if (typeof switchInputMethod === 'function' && document.querySelector('.method-card')) {
+            switchInputMethod('manual');
+        }
+        
+        // 생성된 내용을 검토 탭에 자동 입력
+        const companyNameElement = document.getElementById('companyName');
+        const industryElement = document.getElementById('industry');
+        const reviewCompany = document.getElementById('reviewCompany');
+        const reviewIndustry = document.getElementById('reviewIndustry');
+        const rulesText = document.getElementById('rulesText');
+        
+        if (reviewCompany && companyNameElement) {
+            reviewCompany.value = companyNameElement.value;
+        }
+        if (reviewIndustry && industryElement) {
+            reviewIndustry.value = industryElement.value;
+        }
+        if (rulesText) {
+            rulesText.value = content.replace(/<[^>]*>/g, '').trim();
+        }
+        
+        // 검토 시작
+        setTimeout(() => reviewRules(), 500);
+    }, 200);
 }
 
 // 규칙 검토
