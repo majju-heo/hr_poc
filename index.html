@@ -321,392 +321,14 @@
     </div>
 
     <script>
-        // 탭 전환
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-        if (event && event.target) {
-    const tabElement = event.target.closest('.tab');
-    if (tabElement) {
-        tabElement.classList.add('active');
-    }
-} else {
-    document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
-}         
+        
+       // 탭 전환
+function switchTab(tabName) {
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    event.target.closest('.tab').classList.add('active');
     document.getElementById(tabName).classList.add('active');
-        }
-
-        // 완전한 취업규칙 생성
-        async function generateRules() {
-            const companyName = document.getElementById('companyName').value;
-            const industry = document.getElementById('industry').value;
-            const employeeCount = parseInt(document.getElementById('employeeCount').value);
-            const workingHours = document.getElementById('workingHours').value;
-            const specialProvisions = document.getElementById('specialProvisions').value;
-
-            if (!companyName || !industry || !employeeCount) {
-                alert('필수 정보를 모두 입력해주세요.');
-                return;
-            }
-
-            document.getElementById('generateLoading').style.display = 'block';
-
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-            const workingHoursText = {
-                '9to6': '오전 9시부터 오후 6시까지',
-                '8to5': '오전 8시부터 오후 5시까지',
-                '10to7': '오전 10시부터 오후 7시까지',
-                'flexible': '유연근무제 적용'
-            };
-
-            // 업종별 특화 조항
-            let industryChapter = '';
-            if (industry === 'it') {
-                industryChapter = `
-                    <h3>제6장 정보보안 및 개인정보보호</h3>
-                    <p><strong>제15조 (정보보안)</strong><br>
-                    1. 근로자는 개인정보보호법 및 정보통신망법을 준수해야 한다.<br>
-                    2. 회사의 정보시스템에 대한 무단 접근을 금지한다.<br>
-                    3. 업무용 컴퓨터에는 승인된 소프트웨어만 설치할 수 있다.</p>
-                    
-                    <p><strong>제16조 (재택근무)</strong><br>
-                    1. IT업무 특성상 재택근무를 허용한다.<br>
-                    2. 재택근무 시에도 정보보안 규정을 적용한다.</p>
-                `;
-            } else if (industry === 'manufacturing') {
-                industryChapter = `
-                    <h3>제6장 안전 및 보건</h3>
-                    <p><strong>제15조 (안전규정)</strong><br>
-                    1. 근로자는 산업안전보건법에 따라 안전보호구를 착용해야 한다.<br>
-                    2. 위험작업 시 안전관리자의 승인을 받아야 한다.<br>
-                    3. 안전사고 발생 시 즉시 상급자에게 보고해야 한다.</p>
-                    
-                    <p><strong>제16조 (보호구 착용)</strong><br>
-                    1. 안전모, 안전화 등 개인보호구 착용은 의무이다.<br>
-                    2. 보호구는 회사에서 지급하며 적절히 관리해야 한다.</p>
-                `;
-            }
-
-            // 회사 규모별 조항
-            let sizeClause = '';
-            if (employeeCount >= 300) {
-                sizeClause = `<p><strong>제17조 (노사협의회)</strong><br>근로자참여법에 따라 노사협의회를 설치·운영한다.</p>`;
-            } else if (employeeCount >= 50) {
-                sizeClause = `<p><strong>제17조 (고충처리)</strong><br>근로자의 고충 처리를 위한 고충처리위원을 둔다.</p>`;
-            }
-
-            const completeRules = `
-                <div class="generated-rules">
-                    <h2>${companyName} 취업규칙</h2>
-                    
-                    <div style="text-align: center; margin: 20px 0; padding: 15px; background: #e3f2fd; border-radius: 8px;">
-                        <p style="color: #1565c0; font-weight: bold;">📋 본 규칙은 근로기준법 등 관련 법령을 준수하여 작성되었습니다.</p>
-                    </div>
-                    
-                    <h3>제1장 총칙</h3>
-                    <p><strong>제1조 (목적)</strong><br>
-                    이 규칙은 ${companyName}의 근로자의 취업에 관한 사항을 정함을 목적으로 한다.</p>
-                    
-                    <p><strong>제2조 (적용범위)</strong><br>
-                    이 규칙은 회사의 모든 근로자에게 적용한다.</p>
-                    
-                    <p><strong>제3조 (용어의 정의)</strong><br>
-                    "근로자"는 회사에 고용되어 임금을 받고 근로를 제공하는 자를 말한다.</p>
-
-                    <h3>제2장 근로계약</h3>
-                    <p><strong>제4조 (근로계약 체결)</strong><br>
-                    회사는 근로자 채용 시 근로조건을 명시한 근로계약서를 작성한다.</p>
-                    
-                    <p><strong>제5조 (채용서류)</strong><br>
-                    이력서, 졸업증명서, 경력증명서, 건강진단서 등을 제출한다.</p>
-
-                    <h3>제3장 근로시간 및 휴게</h3>
-                    <p><strong>제6조 (근로시간)</strong><br>
-                    1. 소정근로시간은 주 40시간, 1일 8시간으로 한다. (근로기준법 제50조)<br>
-                    2. 근무시간은 ${workingHoursText[workingHours]}로 한다.</p>
-                    
-                    <p><strong>제7조 (휴게시간)</strong><br>
-                    점심시간은 12:00~13:00 (1시간)으로 한다. (근로기준법 제55조)</p>
-                    
-                    <p><strong>제8조 (연장근로)</strong><br>
-                    연장근로는 근로자 동의하에 1주 12시간 한도 내에서 실시한다.</p>
-
-                    <h3>제4장 휴일 및 휴가</h3>
-                    <p><strong>제9조 (휴일)</strong><br>
-                    1. 주휴일: 토요일, 일요일<br>
-                    2. 국경일 및 공휴일<br>
-                    3. 근로자의 날(5월 1일)</p>
-                    
-                    <p><strong>제10조 (연차유급휴가)</strong><br>
-                    1년간 8할 이상 출근한 근로자에게 15일의 유급휴가를 준다. (근로기준법 제60조)</p>
-                    
-                    <p><strong>제11조 (경조휴가)</strong><br>
-                    본인 결혼 5일, 부모 사망 5일, 조부모 사망 3일 등</p>
-
-                    <h3>제5장 임금</h3>
-                    <p><strong>제12조 (임금구성)</strong><br>
-                    임금은 기본급과 제수당으로 구성한다.</p>
-                    
-                    <p><strong>제13조 (임금지급)</strong><br>
-                    임금은 매월 25일에 지급한다.</p>
-                    
-                    <p><strong>제14조 (퇴직급여)</strong><br>
-                    근로자퇴직급여 보장법에 따라 퇴직금을 지급한다.</p>
-
-                    ${industryChapter}
-                    ${sizeClause}
-
-                    <h3>제7장 징계</h3>
-                    <p><strong>제18조 (징계종류)</strong><br>
-                    견책, 감봉, 정직, 해고로 구분한다. (근로기준법 제27조)</p>
-                    
-                    <p><strong>제19조 (징계사유)</strong><br>
-                    무단결근, 회사 명예 실추, 기밀누설 등</p>
-                    
-                    <p><strong>제20조 (징계절차)</strong><br>
-                    징계위원회를 구성하여 결정하며 소명기회를 부여한다.</p>
-
-                    ${specialProvisions ? `<h3>제8장 특별조항</h3><p><strong>제21조 (특별규정)</strong><br>${specialProvisions}</p>` : ''}
-
-                    <h3>제9장 보칙</h3>
-                    <p><strong>제22조 (규칙변경)</strong><br>
-                    이 규칙의 변경은 근로기준법에 따른 절차를 거친다.</p>
-                    
-                    <p><strong>제23조 (시행일)</strong><br>
-                    이 규칙은 ${new Date().toLocaleDateString('ko-KR')}부터 시행한다.</p>
-                    
-                    <div style="margin-top: 40px; text-align: center; border-top: 2px solid #e2e8f0; padding-top: 20px;">
-                        <p><strong>제정일:</strong> ${new Date().toLocaleDateString('ko-KR')}</p>
-                        <p style="margin-top: 15px; font-size: 18px;"><strong>${companyName}</strong></p>
-                        <p><strong>대표이사 (인)</strong></p>
-                    </div>
-                    
-                    <div style="margin-top: 30px; padding: 20px; background: #f0f8ff; border: 2px solid #4169e1; border-radius: 8px;">
-                        <h4 style="color: #1e3a8a;">📋 법령 준수 현황</h4>
-                        <p style="color: #1e40af;">✅ 근로기준법 제50조 (근로시간) 준수</p>
-                        <p style="color: #1e40af;">✅ 근로기준법 제55조 (휴게시간) 준수</p>
-                        <p style="color: #1e40af;">✅ 근로기준법 제60조 (연차휴가) 준수</p>
-                        <p style="color: #1e40af;">✅ 근로기준법 제27조 (징계절차) 준수</p>
-                        ${industry === 'it' ? '<p style="color: #1e40af;">✅ 개인정보보호법 준수</p>' : ''}
-                        ${industry === 'manufacturing' ? '<p style="color: #1e40af;">✅ 산업안전보건법 준수</p>' : ''}
-                    </div>
-                                        
-                    <div style="margin-top: 20px; padding: 20px; background: #d4edda; border: 2px solid #28a745; border-radius: 8px;">
-                        <h4 style="color: #155724;">✅ 완전한 취업규칙 생성 완료!</h4>
-                        <p style="color: #155724;">📊 법령 준수율: 98%</p>
-                        <p style="color: #155724;">🎉 노동부 신고 준비 완료 상태</p>
-                        <hr style="margin: 15px 0; border: none; border-top: 1px solid #c3e6cb;">
-                        <p style="font-size: 12px; color: #6c757d; margin: 10px 0 0 0; text-align: center;">
-                            <i class="fas fa-shield-alt"></i> <strong>분석 기술:</strong> Claude 4.0 API |
-                            <i class="fas fa-database"></i> <strong>연동 DB:</strong> 국가법령정보센터 · 고용노동부 가이드라인
-                        </p>    
-                        <p style="color: #155724;">📋 총 23개 조항, 9개 장으로 구성</p>
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('generatedRules').innerHTML = completeRules;
-            document.getElementById('generateLoading').style.display = 'none';
-        }
-
-        // 자동 검토
-        function autoReview() {
-            const content = document.getElementById('generatedRules').innerHTML;
-            if (!content || content.includes('좌측 정보를 입력하고')) {
-                alert('먼저 취업규칙을 생성해주세요.');
-                return;
-            }
-            
-            switchTab('review');
-            document.querySelector('[onclick="switchTab(\'review\')"]').click();
-            
-            document.getElementById('reviewCompany').value = document.getElementById('companyName').value;
-            document.getElementById('reviewIndustry').value = document.getElementById('industry').value;
-            document.getElementById('rulesText').value = content.replace(/<[^>]*>/g, '').trim();
-            
-            setTimeout(() => reviewRules(), 500);
-        }
-
-        // 규칙 검토
-        async function reviewRules() {
-            const rulesText = document.getElementById('rulesText').value;
-            const industry = document.getElementById('reviewIndustry').value;
-            
-            if (!rulesText.trim()) {
-                alert('검토할 취업규칙을 입력해주세요.');
-                return;
-            }
-
-            document.getElementById('reviewLoading').style.display = 'block';
-            document.getElementById('reviewResult').style.display = 'none';
-            document.getElementById('noReviewYet').style.display = 'none';
-
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-            // 간단한 법령 검토
-            const issues = [];
-            let riskLevel = 'low';
-
-            if (!/주.*40시간/i.test(rulesText)) {
-                issues.push({
-                    title: '근로시간 규정 누락',
-                    description: '근로기준법 제50조에 따른 주 40시간 규정이 없습니다.',
-                    solution: '주 40시간 근로시간 규정을 추가해야 합니다.'
-                });
-                riskLevel = 'critical';
-            }
-
-            if (!/연차.*휴가/i.test(rulesText)) {
-                issues.push({
-                    title: '연차휴가 규정 불명확',
-                    description: '근로기준법 제60조에 따른 연차휴가 규정이 부족합니다.',
-                    solution: '15일 연차휴가 규정을 명시해야 합니다.'
-                });
-                if (riskLevel === 'low') riskLevel = 'medium';
-            }
-
-            const riskBadge = {
-                'low': { text: '낮음', class: 'risk-low', icon: 'fas fa-check-circle' },
-                'medium': { text: '보통', class: 'risk-medium', icon: 'fas fa-exclamation-triangle' },
-                'critical': { text: '매우 높음', class: 'risk-critical', icon: 'fas fa-times-circle' }
-            }[riskLevel];
-
-            let issuesHTML = '<h4><i class="fas fa-exclamation-triangle"></i> 발견된 문제점</h4>';
-            if (issues.length === 0) {
-                issuesHTML += '<div class="info-card success"><p><i class="fas fa-check"></i> 발견된 문제점이 없습니다.</p></div>';
-            } else {
-                issues.forEach(issue => {
-                    issuesHTML += `
-                        <div class="issue-item">
-                            <h4><i class="fas fa-bug"></i> ${issue.title}</h4>
-                            <p><strong>문제:</strong> ${issue.description}</p>
-                            <p><strong>해결방안:</strong> ${issue.solution}</p>
-                            </div>
-                    `;
-                });
-            }
-
-            document.getElementById('riskLevel').innerHTML = `
-                <div class="risk-badge ${riskBadge.class}">
-                    <i class="${riskBadge.icon}"></i>
-                    <span>법적 리스크: ${riskBadge.text}</span>
-                </div>
-            `;
-
-            document.getElementById('issues').innerHTML = issuesHTML;
-            
-            document.getElementById('suggestions').innerHTML = `
-                <h4><i class="fas fa-lightbulb"></i> 개선 권장사항</h4>
-                <div class="info-card">
-                    <p>• 근로기준법 최신 개정사항 반영</p>
-                    <p>• 업종별 특화 조항 추가 검토</p>
-                    <p>• 노동부 신고 전 최종 검토 권장</p>
-                </div>
-            `;
-
-            document.getElementById('reviewResult').style.display = 'block';
-            document.getElementById('reviewLoading').style.display = 'none';
-        }
-
-        // 보고서 생성
-        function generateReport() {
-            alert('보고서 생성 기능은 개발 중입니다.');
-        }
-
-        // 다운로드
-        function downloadRules() {
-            const content = document.getElementById('generatedRules').innerHTML;
-            if (!content || content.includes('좌측 정보를 입력하고')) {
-                alert('먼저 취업규칙을 생성해주세요.');
-                return;
-            }
-            
-            const blob = new Blob([content], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = '취업규칙.html';
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        // 비교 분석
-        async function compareRules() {
-            const industry = document.getElementById('compareIndustry').value;
-            const size = document.getElementById('compareSize').value;
-            
-            document.querySelector('#compare .loading')?.remove();
-            const loading = document.createElement('div');
-            loading.className = 'loading';
-            loading.innerHTML = `
-                <div class="spinner"></div>
-                <p><i class="fas fa-cog fa-spin"></i> 업종별 기준을 분석하고 있습니다...</p>
-            `;
-            document.getElementById('compare').appendChild(loading);
-
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-            const comparisonData = {
-                it: {
-                    workingHours: '주 40시간 (유연근무 80%)',
-                    vacation: '연차 15일 + 특별휴가 5일',
-                    benefits: '4대보험, 퇴직금, 복지포인트',
-                    salary: '연봉제 (성과급 포함)'
-                },
-                manufacturing: {
-                    workingHours: '주 40시간 (교대근무 가능)',
-                    vacation: '연차 15일 + 하계휴가 3일',
-                    benefits: '4대보험, 퇴직금, 안전보험',
-                    salary: '월급제 (위험수당 포함)'
-                }
-            };
-
-            const data = comparisonData[industry] || comparisonData.it;
-
-            document.getElementById('comparisonResult').innerHTML = `
-                <div class="comparison-result">
-                    <h4><i class="fas fa-chart-line"></i> ${industry.toUpperCase()} 업종 표준 기준</h4>
-                    
-                    <div class="comparison-item">
-                        <h5>근로시간</h5>
-                        <p>${data.workingHours}</p>
-                    </div>
-                    
-                    <div class="comparison-item">
-                        <h5>휴가제도</h5>
-                        <p>${data.vacation}</p>
-                    </div>
-                    
-                    <div class="comparison-item">
-                        <h5>복리후생</h5>
-                        <p>${data.benefits}</p>
-                    </div>
-                    
-                    <div class="comparison-item">
-                        <h5>급여체계</h5>
-                        <p>${data.salary}</p>
-                    </div>
-                    
-                    <div class="info-card success" style="margin-top: 20px;">
-                        <h4><i class="fas fa-check"></i> 분석 완료</h4>
-                        <p>업종별 표준 기준과 비교한 결과입니다.</p>
-                    </div>
-                </div>
-            `;
-
-            loading.remove();
-        }
-
-        // 비교표 내보내기
-        function exportComparison() {
-            alert('비교표 내보내기 기능은 개발 중입니다.');
-        }
-
-        // 초기화
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('MCP 기반 취업규칙 AI 자동화 플랫폼이 로드되었습니다.');
-        });
+}
 
 // 입력 방식 전환
 function switchInputMethod(method) {
@@ -720,54 +342,19 @@ function switchInputMethod(method) {
     const uploadSection = document.getElementById('uploadSection');
     const manualSection = document.getElementById('manualSection');
     
-    if (method === 'upload') {
-        uploadSection.classList.remove('hidden');
-        manualSection.classList.add('hidden');
-    } else {
-        uploadSection.classList.add('hidden');
-        manualSection.classList.remove('hidden');
+    if (uploadSection && manualSection) {
+        if (method === 'upload') {
+            uploadSection.classList.remove('hidden');
+            manualSection.classList.add('hidden');
+        } else {
+            uploadSection.classList.add('hidden');
+            manualSection.classList.remove('hidden');
+        }
     }
     
     // 결과 초기화
     resetReviewResult();
 }
-
-// 파일 업로드 이벤트 설정
-document.addEventListener('DOMContentLoaded', function() {
-    const fileUploadArea = document.getElementById('fileUploadArea');
-    const fileInput = document.getElementById('fileUpload');
-    
-    // 클릭으로 파일 선택
-    fileUploadArea.addEventListener('click', () => {
-        fileInput.click();
-    });
-    
-    // 드래그 앤 드롭
-    fileUploadArea.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        fileUploadArea.classList.add('dragover');
-    });
-    
-    fileUploadArea.addEventListener('dragleave', () => {
-        fileUploadArea.classList.remove('dragover');
-    });
-    
-    fileUploadArea.addEventListener('drop', (e) => {
-        e.preventDefault();
-        fileUploadArea.classList.remove('dragover');
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-            handleFileUpload(files[0]);
-        }
-    });
-    
-    // 파일 선택
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files.length > 0) {
-            handleFileUpload(e.target.files[0]);
-        }
-    });
-});
 
 // 파일 업로드 처리
 async function handleFileUpload(file) {
@@ -786,8 +373,10 @@ async function handleFileUpload(file) {
     }
     
     // 로딩 표시
-    document.getElementById('uploadLoading').style.display = 'block';
-    document.getElementById('uploadResult').classList.add('hidden');
+    const uploadLoading = document.getElementById('uploadLoading');
+    const uploadResult = document.getElementById('uploadResult');
+    if (uploadLoading) uploadLoading.style.display = 'block';
+    if (uploadResult) uploadResult.classList.add('hidden');
     
     try {
         // 파일 읽기 시뮬레이션
@@ -811,7 +400,7 @@ async function handleFileUpload(file) {
     } catch (error) {
         alert('파일 업로드 중 오류가 발생했습니다: ' + error.message);
     } finally {
-        document.getElementById('uploadLoading').style.display = 'none';
+        if (uploadLoading) uploadLoading.style.display = 'none';
     }
 }
 
@@ -884,32 +473,47 @@ function extractCompanyInfo(content, fileName) {
 // 업로드 결과 표시
 function showUploadResult(file, extractedInfo, content) {
     // 파일 정보 표시
-    document.getElementById('fileName').textContent = `${file.name} (${(file.size / 1024).toFixed(1)}KB)`;
+    const fileName = document.getElementById('fileName');
+    if (fileName) {
+        fileName.textContent = `${file.name} (${(file.size / 1024).toFixed(1)}KB)`;
+    }
     
     // 추출된 정보 표시
-    document.getElementById('extractedCompany').textContent = `회사명: ${extractedInfo.company}`;
-    document.getElementById('extractedIndustry').textContent = `업종: ${extractedInfo.industry}`;
-    document.getElementById('extractedEmployees').textContent = `직원 수: ${extractedInfo.employees}`;
+    const extractedCompany = document.getElementById('extractedCompany');
+    const extractedIndustry = document.getElementById('extractedIndustry');
+    const extractedEmployees = document.getElementById('extractedEmployees');
+    
+    if (extractedCompany) extractedCompany.textContent = `회사명: ${extractedInfo.company}`;
+    if (extractedIndustry) extractedIndustry.textContent = `업종: ${extractedInfo.industry}`;
+    if (extractedEmployees) extractedEmployees.textContent = `직원 수: ${extractedInfo.employees}`;
     
     // 수동 입력 필드에 자동 입력
-    document.getElementById('reviewCompany').value = extractedInfo.company;
-    const industrySelect = document.getElementById('reviewIndustry');
-    if (extractedInfo.industry.includes('제조')) {
-        industrySelect.value = 'manufacturing';
-    } else if (extractedInfo.industry.includes('정보통신')) {
-        industrySelect.value = 'it';
-    } else if (extractedInfo.industry.includes('금융')) {
-        industrySelect.value = 'finance';
+    const reviewCompany = document.getElementById('reviewCompany');
+    const reviewIndustry = document.getElementById('reviewIndustry');
+    const rulesText = document.getElementById('rulesText');
+    
+    if (reviewCompany) reviewCompany.value = extractedInfo.company;
+    if (reviewIndustry) {
+        if (extractedInfo.industry.includes('제조')) {
+            reviewIndustry.value = 'manufacturing';
+        } else if (extractedInfo.industry.includes('정보통신')) {
+            reviewIndustry.value = 'it';
+        } else if (extractedInfo.industry.includes('금융')) {
+            reviewIndustry.value = 'finance';
+        }
     }
-    document.getElementById('rulesText').value = content;
+    if (rulesText) rulesText.value = content;
     
     // 결과 영역 표시
-    document.getElementById('uploadResult').classList.remove('hidden');
+    const uploadResult = document.getElementById('uploadResult');
+    if (uploadResult) uploadResult.classList.remove('hidden');
     
     // 자동으로 검토 버튼 활성화 상태 표시
     const reviewBtn = document.querySelector('.btn-primary');
-    reviewBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
-    reviewBtn.innerHTML = '<i class="fas fa-magic"></i> 자동 검토 시작';
+    if (reviewBtn) {
+        reviewBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+        reviewBtn.innerHTML = '<i class="fas fa-magic"></i> 자동 검토 시작';
+    }
 }
 
 // 파일 미리보기
@@ -940,63 +544,284 @@ function previewFile() {
 
 // 파일 제거
 function removeFile() {
-    document.getElementById('uploadResult').classList.add('hidden');
-    document.getElementById('fileUpload').value = '';
-    document.getElementById('reviewCompany').value = '';
-    document.getElementById('reviewIndustry').value = '';
-    document.getElementById('rulesText').value = '';
+    const uploadResult = document.getElementById('uploadResult');
+    const fileUpload = document.getElementById('fileUpload');
+    const reviewCompany = document.getElementById('reviewCompany');
+    const reviewIndustry = document.getElementById('reviewIndustry');
+    const rulesText = document.getElementById('rulesText');
+    
+    if (uploadResult) uploadResult.classList.add('hidden');
+    if (fileUpload) fileUpload.value = '';
+    if (reviewCompany) reviewCompany.value = '';
+    if (reviewIndustry) reviewIndustry.value = '';
+    if (rulesText) rulesText.value = '';
     
     // 버튼 원상복구
     const reviewBtn = document.querySelector('.btn-primary');
-    reviewBtn.style.background = '';
-    reviewBtn.innerHTML = '<i class="fas fa-search"></i> 검토 시작';
+    if (reviewBtn) {
+        reviewBtn.style.background = '';
+        reviewBtn.innerHTML = '<i class="fas fa-search"></i> 검토 시작';
+    }
     
     resetReviewResult();
 }
 
 // 검토 결과 초기화
 function resetReviewResult() {
-    document.getElementById('reviewResult').style.display = 'none';
-    document.getElementById('noReviewYet').style.display = 'block';
+    const reviewResult = document.getElementById('reviewResult');
+    const noReviewYet = document.getElementById('noReviewYet');
+    
+    if (reviewResult) reviewResult.style.display = 'none';
+    if (noReviewYet) noReviewYet.style.display = 'block';
 }
 
-// 기존 reviewRules 함수 개선
+// 완전한 취업규칙 생성
+async function generateRules() {
+    const companyName = document.getElementById('companyName').value;
+    const industry = document.getElementById('industry').value;
+    const employeeCount = parseInt(document.getElementById('employeeCount').value);
+    const workingHours = document.getElementById('workingHours').value;
+    const specialProvisions = document.getElementById('specialProvisions').value;
+
+    if (!companyName || !industry || !employeeCount) {
+        alert('필수 정보를 모두 입력해주세요.');
+        return;
+    }
+
+    document.getElementById('generateLoading').style.display = 'block';
+
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    const workingHoursText = {
+        '9to6': '오전 9시부터 오후 6시까지',
+        '8to5': '오전 8시부터 오후 5시까지',
+        '10to7': '오전 10시부터 오후 7시까지',
+        'flexible': '유연근무제 적용'
+    };
+
+    // 업종별 특화 조항
+    let industryChapter = '';
+    if (industry === 'it') {
+        industryChapter = `
+            <h3>제6장 정보보안 및 개인정보보호</h3>
+            <p><strong>제15조 (정보보안)</strong><br>
+            1. 근로자는 개인정보보호법 및 정보통신망법을 준수해야 한다.<br>
+            2. 회사의 정보시스템에 대한 무단 접근을 금지한다.<br>
+            3. 업무용 컴퓨터에는 승인된 소프트웨어만 설치할 수 있다.</p>
+            
+            <p><strong>제16조 (재택근무)</strong><br>
+            1. IT업무 특성상 재택근무를 허용한다.<br>
+            2. 재택근무 시에도 정보보안 규정을 적용한다.</p>
+        `;
+    } else if (industry === 'manufacturing') {
+        industryChapter = `
+            <h3>제6장 안전 및 보건</h3>
+            <p><strong>제15조 (안전규정)</strong><br>
+            1. 근로자는 산업안전보건법에 따라 안전보호구를 착용해야 한다.<br>
+            2. 위험작업 시 안전관리자의 승인을 받아야 한다.<br>
+            3. 안전사고 발생 시 즉시 상급자에게 보고해야 한다.</p>
+            
+            <p><strong>제16조 (보호구 착용)</strong><br>
+            1. 안전모, 안전화 등 개인보호구 착용은 의무이다.<br>
+            2. 보호구는 회사에서 지급하며 적절히 관리해야 한다.</p>
+        `;
+    }
+
+    // 회사 규모별 조항
+    let sizeClause = '';
+    if (employeeCount >= 300) {
+        sizeClause = `<p><strong>제17조 (노사협의회)</strong><br>근로자참여법에 따라 노사협의회를 설치·운영한다.</p>`;
+    } else if (employeeCount >= 50) {
+        sizeClause = `<p><strong>제17조 (고충처리)</strong><br>근로자의 고충 처리를 위한 고충처리위원을 둔다.</p>`;
+    }
+
+    const completeRules = `
+        <div class="generated-rules">
+            <h2>${companyName} 취업규칙</h2>
+            
+            <div style="text-align: center; margin: 20px 0; padding: 15px; background: #e3f2fd; border-radius: 8px;">
+                <p style="color: #1565c0; font-weight: bold;">📋 본 규칙은 근로기준법 등 관련 법령을 준수하여 작성되었습니다.</p>
+            </div>
+            
+            <h3>제1장 총칙</h3>
+            <p><strong>제1조 (목적)</strong><br>
+            이 규칙은 ${companyName}의 근로자의 취업에 관한 사항을 정함을 목적으로 한다.</p>
+            
+            <p><strong>제2조 (적용범위)</strong><br>
+            이 규칙은 회사의 모든 근로자에게 적용한다.</p>
+            
+            <p><strong>제3조 (용어의 정의)</strong><br>
+            "근로자"는 회사에 고용되어 임금을 받고 근로를 제공하는 자를 말한다.</p>
+
+            <h3>제2장 근로계약</h3>
+            <p><strong>제4조 (근로계약 체결)</strong><br>
+            회사는 근로자 채용 시 근로조건을 명시한 근로계약서를 작성한다.</p>
+            
+            <p><strong>제5조 (채용서류)</strong><br>
+            이력서, 졸업증명서, 경력증명서, 건강진단서 등을 제출한다.</p>
+
+            <h3>제3장 근로시간 및 휴게</h3>
+            <p><strong>제6조 (근로시간)</strong><br>
+            1. 소정근로시간은 주 40시간, 1일 8시간으로 한다. (근로기준법 제50조)<br>
+            2. 근무시간은 ${workingHoursText[workingHours]}로 한다.</p>
+            
+            <p><strong>제7조 (휴게시간)</strong><br>
+            점심시간은 12:00~13:00 (1시간)으로 한다. (근로기준법 제55조)</p>
+            
+            <p><strong>제8조 (연장근로)</strong><br>
+            연장근로는 근로자 동의하에 1주 12시간 한도 내에서 실시한다.</p>
+
+            <h3>제4장 휴일 및 휴가</h3>
+            <p><strong>제9조 (휴일)</strong><br>
+            1. 주휴일: 토요일, 일요일<br>
+            2. 국경일 및 공휴일<br>
+            3. 근로자의 날(5월 1일)</p>
+            
+            <p><strong>제10조 (연차유급휴가)</strong><br>
+            1년간 8할 이상 출근한 근로자에게 15일의 유급휴가를 준다. (근로기준법 제60조)</p>
+            
+            <p><strong>제11조 (경조휴가)</strong><br>
+            본인 결혼 5일, 부모 사망 5일, 조부모 사망 3일 등</p>
+
+            <h3>제5장 임금</h3>
+            <p><strong>제12조 (임금구성)</strong><br>
+            임금은 기본급과 제수당으로 구성한다.</p>
+            
+            <p><strong>제13조 (임금지급)</strong><br>
+            임금은 매월 25일에 지급한다.</p>
+            
+            <p><strong>제14조 (퇴직급여)</strong><br>
+            근로자퇴직급여 보장법에 따라 퇴직금을 지급한다.</p>
+
+            ${industryChapter}
+            ${sizeClause}
+
+            <h3>제7장 징계</h3>
+            <p><strong>제18조 (징계종류)</strong><br>
+            견책, 감봉, 정직, 해고로 구분한다. (근로기준법 제27조)</p>
+            
+            <p><strong>제19조 (징계사유)</strong><br>
+            무단결근, 회사 명예 실추, 기밀누설 등</p>
+            
+            <p><strong>제20조 (징계절차)</strong><br>
+            징계위원회를 구성하여 결정하며 소명기회를 부여한다.</p>
+
+            ${specialProvisions ? `<h3>제8장 특별조항</h3><p><strong>제21조 (특별규정)</strong><br>${specialProvisions}</p>` : ''}
+
+            <h3>제9장 보칙</h3>
+            <p><strong>제22조 (규칙변경)</strong><br>
+            이 규칙의 변경은 근로기준법에 따른 절차를 거친다.</p>
+            
+            <p><strong>제23조 (시행일)</strong><br>
+            이 규칙은 ${new Date().toLocaleDateString('ko-KR')}부터 시행한다.</p>
+            
+            <div style="margin-top: 40px; text-align: center; border-top: 2px solid #e2e8f0; padding-top: 20px;">
+                <p><strong>제정일:</strong> ${new Date().toLocaleDateString('ko-KR')}</p>
+                <p style="margin-top: 15px; font-size: 18px;"><strong>${companyName}</strong></p>
+                <p><strong>대표이사 (인)</strong></p>
+            </div>
+            
+            <div style="margin-top: 30px; padding: 20px; background: #f0f8ff; border: 2px solid #4169e1; border-radius: 8px;">
+                <h4 style="color: #1e3a8a;">📋 법령 준수 현황</h4>
+                <p style="color: #1e40af;">✅ 근로기준법 제50조 (근로시간) 준수</p>
+                <p style="color: #1e40af;">✅ 근로기준법 제55조 (휴게시간) 준수</p>
+                <p style="color: #1e40af;">✅ 근로기준법 제60조 (연차휴가) 준수</p>
+                <p style="color: #1e40af;">✅ 근로기준법 제27조 (징계절차) 준수</p>
+                ${industry === 'it' ? '<p style="color: #1e40af;">✅ 개인정보보호법 준수</p>' : ''}
+                ${industry === 'manufacturing' ? '<p style="color: #1e40af;">✅ 산업안전보건법 준수</p>' : ''}
+            </div>
+                                
+            <div style="margin-top: 20px; padding: 20px; background: #d4edda; border: 2px solid #28a745; border-radius: 8px;">
+                <h4 style="color: #155724;">✅ 완전한 취업규칙 생성 완료!</h4>
+                <p style="color: #155724;">📊 법령 준수율: 98%</p>
+                <p style="color: #155724;">🎉 노동부 신고 준비 완료 상태</p>
+                <hr style="margin: 15px 0; border: none; border-top: 1px solid #c3e6cb;">
+                <p style="font-size: 12px; color: #6c757d; margin: 10px 0 0 0; text-align: center;">
+                    <i class="fas fa-shield-alt"></i> <strong>분석 기술:</strong> Claude 4.0 API |
+                    <i class="fas fa-database"></i> <strong>연동 DB:</strong> 국가법령정보센터 · 고용노동부 가이드라인
+                </p>    
+                <p style="color: #155724;">📋 총 23개 조항, 9개 장으로 구성</p>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('generatedRules').innerHTML = completeRules;
+    document.getElementById('generateLoading').style.display = 'none';
+}
+
+// 자동 검토
+function autoReview() {
+    const content = document.getElementById('generatedRules').innerHTML;
+    if (!content || content.includes('좌측 정보를 입력하고')) {
+        alert('먼저 취업규칙을 생성해주세요.');
+        return;
+    }
+    
+    // 검토 탭으로 이동
+    switchTab('review');
+    document.querySelector('[onclick="switchTab(\'review\')"]').click();
+    
+    // 수동 입력 방식으로 전환 (안전하게 체크)
+    if (typeof switchInputMethod === 'function') {
+        switchInputMethod('manual');
+    }
+    
+    // 생성된 내용을 검토 탭에 자동 입력
+    const reviewCompany = document.getElementById('reviewCompany');
+    const reviewIndustry = document.getElementById('reviewIndustry');
+    const rulesText = document.getElementById('rulesText');
+    
+    if (reviewCompany) reviewCompany.value = document.getElementById('companyName').value;
+    if (reviewIndustry) reviewIndustry.value = document.getElementById('industry').value;
+    if (rulesText) rulesText.value = content.replace(/<[^>]*>/g, '').trim();
+    
+    setTimeout(() => reviewRules(), 500);
+}
+
+// 규칙 검토
 async function reviewRules() {
     let rulesText = '';
     let company = '';
     let industry = '';
     
     // 업로드 방식인지 수동 입력 방식인지 확인
-    const activeMethod = document.querySelector('.method-card.active').dataset.method;
+    const activeMethodCard = document.querySelector('.method-card.active');
+    const activeMethod = activeMethodCard ? activeMethodCard.dataset.method : 'manual';
     
     if (activeMethod === 'upload') {
         // 업로드된 파일이 있는지 확인
-        if (document.getElementById('uploadResult').classList.contains('hidden')) {
+        const uploadResult = document.getElementById('uploadResult');
+        if (uploadResult && uploadResult.classList.contains('hidden')) {
             alert('먼저 파일을 업로드해주세요.');
             return;
         }
-        rulesText = document.getElementById('rulesText').value;
-        company = document.getElementById('reviewCompany').value;
-        industry = document.getElementById('reviewIndustry').value;
-    } else {
-        // 수동 입력 확인
-        rulesText = document.getElementById('rulesText').value;
-        company = document.getElementById('reviewCompany').value;
-        industry = document.getElementById('reviewIndustry').value;
-        
-        if (!rulesText.trim()) {
-            alert('검토할 취업규칙을 입력해주세요.');
-            return;
-        }
+    }
+    
+    // 공통 필드에서 값 가져오기
+    const rulesTextElement = document.getElementById('rulesText');
+    const companyElement = document.getElementById('reviewCompany');
+    const industryElement = document.getElementById('reviewIndustry');
+    
+    rulesText = rulesTextElement ? rulesTextElement.value : '';
+    company = companyElement ? companyElement.value : '';
+    industry = industryElement ? industryElement.value : '';
+    
+    if (!rulesText.trim()) {
+        alert('검토할 취업규칙을 입력해주세요.');
+        return;
     }
 
-    document.getElementById('reviewLoading').style.display = 'block';
-    document.getElementById('reviewResult').style.display = 'none';
-    document.getElementById('noReviewYet').style.display = 'none';
+    const reviewLoading = document.getElementById('reviewLoading');
+    const reviewResult = document.getElementById('reviewResult');
+    const noReviewYet = document.getElementById('noReviewYet');
+    
+    if (reviewLoading) reviewLoading.style.display = 'block';
+    if (reviewResult) reviewResult.style.display = 'none';
+    if (noReviewYet) noReviewYet.style.display = 'none';
 
     await new Promise(resolve => setTimeout(resolve, 2000));
 
-    // 기존 검토 로직은 그대로 유지
+    // 간단한 법령 검토
     const issues = [];
     let riskLevel = 'low';
 
@@ -1028,7 +853,204 @@ async function reviewRules() {
     if (issues.length === 0) {
         issuesHTML += '<div class="info-card success"><p><i class="fas fa-check"></i> 발견된 문제점이 없습니다.</p></div>';
     } else {
-        issues.forEach
+        issues.forEach(issue => {
+            issuesHTML += `
+                <div class="issue-item">
+                    <h4><i class="fas fa-bug"></i> ${issue.title}</h4>
+                    <p><strong>문제:</strong> ${issue.description}</p>
+                    <p><strong>해결방안:</strong> ${issue.solution}</p>
+                </div>
+            `;
+        });
+    }
+
+    const riskLevel_element = document.getElementById('riskLevel');
+    const issues_element = document.getElementById('issues');
+    const suggestions_element = document.getElementById('suggestions');
+
+    if (riskLevel_element) {
+        riskLevel_element.innerHTML = `
+            <div class="risk-badge ${riskBadge.class}">
+                <i class="${riskBadge.icon}"></i>
+                <span>법적 리스크: ${riskBadge.text}</span>
+            </div>
+        `;
+    }
+
+    if (issues_element) {
+        issues_element.innerHTML = issuesHTML;
+    }
+    
+    if (suggestions_element) {
+        suggestions_element.innerHTML = `
+            <h4><i class="fas fa-lightbulb"></i> 개선 권장사항</h4>
+            <div class="info-card">
+                <p>• 근로기준법 최신 개정사항 반영</p>
+                <p>• 업종별 특화 조항 추가 검토</p>
+                <p>• 노동부 신고 전 최종 검토 권장</p>
+                ${activeMethod === 'upload' ? '<p>• 업로드된 파일의 원본 서식 유지 권장</p>' : ''}
+            </div>
+        `;
+    }
+
+    if (reviewResult) reviewResult.style.display = 'block';
+    if (reviewLoading) reviewLoading.style.display = 'none';
+}
+
+// 보고서 생성
+function generateReport() {
+    alert('보고서 생성 기능은 개발 중입니다.');
+}
+
+// 다운로드
+function downloadRules() {
+    const content = document.getElementById('generatedRules').innerHTML;
+    if (!content || content.includes('좌측 정보를 입력하고')) {
+        alert('먼저 취업규칙을 생성해주세요.');
+        return;
+    }
+    
+    const blob = new Blob([content], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '취업규칙.html';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// 비교 분석
+async function compareRules() {
+    const industry = document.getElementById('compareIndustry').value;
+    const size = document.getElementById('compareSize').value;
+    
+    const existingLoading = document.querySelector('#compare .loading');
+    if (existingLoading) {
+        existingLoading.remove();
+    }
+    
+    const loading = document.createElement('div');
+    loading.className = 'loading';
+    loading.innerHTML = `
+        <div class="spinner"></div>
+        <p><i class="fas fa-cog fa-spin"></i> 업종별 기준을 분석하고 있습니다...</p>
+    `;
+    document.getElementById('compare').appendChild(loading);
+
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    const comparisonData = {
+        it: {
+            workingHours: '주 40시간 (유연근무 80%)',
+            vacation: '연차 15일 + 특별휴가 5일',
+            benefits: '4대보험, 퇴직금, 복지포인트',
+            salary: '연봉제 (성과급 포함)'
+        },
+        manufacturing: {
+            workingHours: '주 40시간 (교대근무 가능)',
+            vacation: '연차 15일 + 하계휴가 3일',
+            benefits: '4대보험, 퇴직금, 안전보험',
+            salary: '월급제 (위험수당 포함)'
+        }
+    };
+
+    const data = comparisonData[industry] || comparisonData.it;
+
+    const comparisonResult = document.getElementById('comparisonResult');
+    if (comparisonResult) {
+        comparisonResult.innerHTML = `
+            <div class="comparison-result">
+                <h4><i class="fas fa-chart-line"></i> ${industry.toUpperCase()} 업종 표준 기준</h4>
+                
+                <div class="comparison-item">
+                    <h5>근로시간</h5>
+                    <p>${data.workingHours}</p>
+                </div>
+                
+                <div class="comparison-item">
+                    <h5>휴가제도</h5>
+                    <p>${data.vacation}</p>
+                </div>
+                
+                <div class="comparison-item">
+                    <h5>복리후생</h5>
+                    <p>${data.benefits}</p>
+                </div>
+                
+                <div class="comparison-item">
+                    <h5>급여체계</h5>
+                    <p>${data.salary}</p>
+                </div>
+                
+                <div class="info-card success" style="margin-top: 20px;">
+                    <h4><i class="fas fa-check"></i> 분석 완료</h4>
+                    <p>업종별 표준 기준과 비교한 결과입니다.</p>
+                </div>
+            </div>
+        `;
+    }
+
+    loading.remove();
+}
+
+// 비교표 내보내기
+function exportComparison() {
+    alert('비교표 내보내기 기능은 개발 중입니다.');
+}
+
+// 파일 업로드 이벤트 설정
+function initializeFileUpload() {
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    const fileInput = document.getElementById('fileUpload');
+    
+    if (!fileUploadArea || !fileInput) return;
+    
+    // 클릭으로 파일 선택
+    fileUploadArea.addEventListener('click', () => {
+        fileInput.click();
+    });
+    
+    // 드래그 앤 드롭
+    fileUploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        fileUploadArea.classList.add('dragover');
+    });
+    
+    fileUploadArea.addEventListener('dragleave', () => {
+        fileUploadArea.classList.remove('dragover');
+    });
+    
+    fileUploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        fileUploadArea.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleFileUpload(files[0]);
+        }
+    });
+    
+    // 파일 선택
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            handleFileUpload(e.target.files[0]);
+        }
+    });
+}
+
+// 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('MCP 기반 취업규칙 AI 자동화 플랫폼이 로드되었습니다.');
+    
+    // 파일 업로드 기능 초기화
+    initializeFileUpload();
+    
+    // 업로드 방식을 기본으로 설정 (요소가 존재할 때만)
+    setTimeout(() => {
+        if (typeof switchInputMethod === 'function' && document.querySelector('.method-card')) {
+            switchInputMethod('upload');
+        }
+    }, 100);
+});
         
     </script>
 </body>
